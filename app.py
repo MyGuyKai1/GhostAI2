@@ -67,9 +67,11 @@ def send_message():
     user_input = request.form.get('user_input')
     response = generate_response(user_input)
     return jsonify({'response': response})
+
+
 @app.route('/download')
-    def download():
-        return render_template('downloads.html')
+def download():
+    return render_template('downloads.html')
 
         
 
