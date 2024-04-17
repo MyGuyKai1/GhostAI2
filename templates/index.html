@@ -143,8 +143,8 @@
             color: white;
             text-decoration: none;
             border-radius: 50%; /* Make the button rounded */
-            width: 40x; /* Set the width of the button */
-            height: 40x; /* Set the height of the button */
+            width: 30px; /* Set the width of the button */
+            height: 30px; /* Set the height of the button */
             text-align: center; /* Center the icon */
             line-height: 30px; /* Align the icon vertically */  
             display: flex; /* Enable flexbox */
@@ -154,6 +154,13 @@
 
         .download-button .fa {
             font-size: 20px; /* Set the size of the icon */
+        }
+
+        .img-icon {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
         }
 
         @media only screen and (max-width: 600px) {
@@ -177,6 +184,17 @@
             color: white;
             text-decoration: none;
         }
+        .code-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            /* Other styling for the button */
+        }
     </style>
 
     <script>
@@ -196,12 +214,40 @@
             var messageElement = document.createElement('div');
 
             if (isAI) {
-                messageElement.classList.add('ai-response');
-            }
+                // Extract Python code block, but keep other text
+                message = message.replace(/```python([\s\S]*?)```/, function(match, code) {
+                    return `<div style="position: relative;">
+                            <div class="code-block"><pre><code>${code}</code></pre></div>
+                            <button class="copy-button" style="position: absolute; top: 0; right: 0;" onclick="copyCode(this)">Copy</button>
+                            </div>`;
+                });
 
-            messageElement.innerHTML = '<strong>' + sender + ':</strong> ' + parseBoldText(parseNumberedList(parseFullStops(message)));
+                // Extract generic code block (without copy button), but keep other text
+                message = message.replace(/```([\s\S]*?)```/, function(match, code) {
+                    return `<div class="code-block"><pre><code>${code}</code></pre></div>`;
+                });
+            }
+            
+            messageElement.innerHTML = '<strong>' + sender + ':</strong><br><br>' + message;
             chatDisplay.appendChild(messageElement);
+
+            if (sender === 'You') {
+                var emptyMessageContainer = document.createElement('div');
+                emptyMessageContainer.innerHTML = '<br>';
+                chatDisplay.appendChild(emptyMessageContainer);
+            }
+            if (sender === 'Ghost AI') {
+                var emptyMessageContainer = document.createElement('div');
+                emptyMessageContainer.innerHTML = '<br>';
+                chatDisplay.appendChild(emptyMessageContainer);
+            }
         }
+
+
+        function escapeHtml(html) {
+            return html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
 
         function formatAndAppendMessage(sender, message) {
             var chatDisplay = document.getElementById('chat-display');
@@ -324,11 +370,14 @@
         </div>
     </div>
 
-    <div class="version-number">Version: v2.5</div>
+    <div class="version-number">Version: v2.7.5</div>
     <a href="https://github.com/CyberZenDev/GhostAI" target="_blank" class="github-link">View on GitHub</a>
-    <a href="/download" class="download-button">
-        <i class="fa fa-download"></i>
+    <a href="/img" class="download-button">
+        <img src="{{ url_for('static', filename='img.png') }}" alt="Image Icon" class="img-icon">
     </a>
+    
+    
+    
 
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
